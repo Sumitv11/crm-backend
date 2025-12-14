@@ -1,14 +1,23 @@
-# Use lightweight Java runtime
+# ---------- BUILD STAGE ----------
+FROM maven:3.9.6-eclipse-temurin-17 AS build
+WORKDIR /build
+
+# Copy pom first for dependency caching
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# ---------- RUNTIME STAGE ----------
 FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
 
-# Set working directory
-WORKDIR /src
+# Copy built JAR from build stage
+COPY --from=build /build/target/*.jar app.jar
 
-# Copy JAR file
-COPY backend/target/*.jar crm-0.0.1-SNAPSHOT.jar
-
-# Expose port (Render uses 8080)
-EXPOSE 8090
-
-# Start application
-ENTRYPOINT ["java", "-jar", "crm-0.0.1-SNAPSHOT.jar"]
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
