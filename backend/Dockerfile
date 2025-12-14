@@ -5,7 +5,7 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /src
 
 # Copy JAR file
-COPY target/*.jar crm-0.0.1-SNAPSHOT.jar
+COPY backend/target/*.jar crm-0.0.1-SNAPSHOT.jar
 
 # Expose port (Render uses 8080)
 EXPOSE 8090
